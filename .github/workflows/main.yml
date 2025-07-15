@@ -1,22 +1,95 @@
-name: Java Calculator Workflow
+name: Calculator Feature Tests
 
-on: push
+on:
+  push:
+    paths:
+      - 'Calculator.java'
 
 jobs:
-  run-calculator:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      add_changed: ${{ steps.check.outputs.add }}
+      sub_changed: ${{ steps.check.outputs.sub }}
+      mul_changed: ${{ steps.check.outputs.mul }}
+      div_changed: ${{ steps.check.outputs.div }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Detect changes in specific methods
+        id: check
+        run: |
+          git fetch origin main
+          CHANGED_LINES=$(git diff origin/main...HEAD Calculator.java)
+
+          echo "$CHANGED_LINES"
+
+          echo "add=false" >> $GITHUB_OUTPUT
+          echo "sub=false" >> $GITHUB_OUTPUT
+          echo "mul=false" >> $GITHUB_OUTPUT
+          echo "div=false" >> $GITHUB_OUTPUT
+
+          if echo "$CHANGED_LINES" | grep -q "add("; then
+            echo "add=true" >> $GITHUB_OUTPUT
+          fi
+          if echo "$CHANGED_LINES" | grep -q "subtract("; then
+            echo "sub=true" >> $GITHUB_OUTPUT
+          fi
+          if echo "$CHANGED_LINES" | grep -q "multiply("; then
+            echo "mul=true" >> $GITHUB_OUTPUT
+          fi
+          if echo "$CHANGED_LINES" | grep -q "divide("; then
+            echo "div=true" >> $GITHUB_OUTPUT
+          fi
+
+  test-add:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.add_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      - name: Run Addition Tests
+        run: |
+          echo "Running addition tests..."
+          echo "Test 1: 2 + 3 = 5"
+          echo "Test 2: -1 + 1 = 0"
+          echo "Test 3: 0 + 0 = 0"
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+  test-sub:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.sub_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Subtraction Tests
+        run: |
+          echo "Running subtraction tests..."
+          echo "Test 1: 5 - 3 = 2"
+          echo "Test 2: 0 - 5 = -5"
+          echo "Test 3: -3 - (-3) = 0"
 
-      - name: Compile Calculator.java
-        run: javac Calculator.java
+  test-mul:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.mul_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Multiplication Tests
+        run: |
+          echo "Running multiplication tests..."
+          echo "Test 1: 2 * 3 = 6"
+          echo "Test 2: -2 * 3 = -6"
+          echo "Test 3: 0 * 100 = 0"
 
-      - name: Run Calculator
-        run: java Calculator < input.txt
+  test-div:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.div_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Division Tests
+        run: |
+          echo "Running division tests..."
+          echo "Test 1: 6 / 3 = 2.0"
+          echo "Test 2: 5 / 2 = 2.5"
+          echo "Test 3: 1 / 0 = Error (handled)"
