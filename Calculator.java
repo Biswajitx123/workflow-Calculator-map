@@ -42,7 +42,7 @@ public class Calculator {
                 switch (op) {
                     case "+" -> System.out.println("Result: " + calc.add(a, b));
                     case "-" -> System.out.println("Result: " + calc.subtract(a, b));
-                    case "*" -> System.out.println("Result: " + calc.multiply(a, c));
+                    case "*" -> System.out.println("Result: " + calc.multiply(a, b));
                     case "/" -> System.out.println("Result: " + calc.divide(a, b));
                     default -> System.out.println("Invalid operator");
                 }
