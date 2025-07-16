@@ -37,12 +37,13 @@ public class Calculator {
 
             System.out.print("Enter second number: ");
             int b = scn.nextInt();
+            int c = scn.nextInt();
 
             try {
                 switch (op) {
                     case "+" -> System.out.println("Result: " + calc.add(a, b));
                     case "-" -> System.out.println("Result: " + calc.subtract(a, b));
-                    case "*" -> System.out.println("Result: " + calc.multiply(a, b));
+                    case "*" -> System.out.println("Result: " + calc.multiply(a, c));
                     case "/" -> System.out.println("Result: " + calc.divide(a, b));
                     default -> System.out.println("Invalid operator");
                 }
