@@ -16,10 +16,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Git to detect changes
+      - name: Get diff for last commit
         run: |
-          git fetch origin main
-          git diff origin/main...HEAD Calculator.java > changes.diff
+          git diff HEAD~1 HEAD Calculator.java > changes.diff
           cat changes.diff
 
       - name: Run Sample Tests Based on Method Changes
@@ -27,25 +26,25 @@ jobs:
           echo "Checking which method changed..."
           FOUND=false
 
-          if grep -q 'add(' changes.diff; then
+          if grep -q 'add' changes.diff; then
             echo "Detected change in 'add' method"
             echo "Running sample test for add: 2 + 3 = $((2 + 3))"
             FOUND=true
           fi
 
-          if grep -q 'subtract(' changes.diff; then
+          if grep -q 'subtract' changes.diff; then
             echo "Detected change in 'subtract' method"
             echo "Running sample test for subtract: 5 - 2 = $((5 - 2))"
             FOUND=true
           fi
 
-          if grep -q 'multiply(' changes.diff; then
+          if grep -q 'multiply' changes.diff; then
             echo "Detected change in 'multiply' method"
             echo "Running sample test for multiply: 3 * 4 = $((3 * 4))"
             FOUND=true
           fi
 
-          if grep -q 'divide(' changes.diff; then
+          if grep -q 'divide' changes.diff; then
             echo "Detected change in 'divide' method"
             echo "Running sample test for divide: 10 / 2 = $((10 / 2))"
             FOUND=true
