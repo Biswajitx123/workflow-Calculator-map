@@ -1,4 +1,3 @@
-
 name: Calculator Feature Tests
 
 on:
@@ -20,10 +19,9 @@ jobs:
       - name: Detect changes in specific methods
         id: check
         run: |
-          echo "Comparing commits: ${{ github.event.before }} -> ${{ github.sha }}"
-          CHANGED_LINES=$(git diff ${{ github.event.before }} ${{ github.sha }} -- Calculator.java)
+          git fetch origin main
+          CHANGED_LINES=$(git diff origin/main...HEAD Calculator.java)
 
-          echo "Changed lines:"
           echo "$CHANGED_LINES"
 
           echo "add=false" >> $GITHUB_OUTPUT
