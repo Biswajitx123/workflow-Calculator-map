@@ -1,3 +1,4 @@
+
 name: Calculator Feature Tests
 
 on:
@@ -19,9 +20,11 @@ jobs:
       - name: Detect changes in specific methods
         id: check
         run: |
-          git fetch origin main
-          CHANGED_LINES=$(git diff origin/main...HEAD Calculator.java)
+          echo "Fetching previous commit..."
+          git fetch --depth=2
+          CHANGED_LINES=$(git diff HEAD~1 Calculator.java)
 
+          echo "Changed lines:"
           echo "$CHANGED_LINES"
 
           echo "add=false" >> $GITHUB_OUTPUT
