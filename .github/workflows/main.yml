@@ -20,9 +20,8 @@ jobs:
       - name: Detect changes in specific methods
         id: check
         run: |
-          echo "Fetching previous commit..."
-          git fetch --depth=2
-          CHANGED_LINES=$(git diff HEAD~1 Calculator.java)
+          echo "Comparing commits: ${{ github.event.before }} -> ${{ github.sha }}"
+          CHANGED_LINES=$(git diff ${{ github.event.before }} ${{ github.sha }} -- Calculator.java)
 
           echo "Changed lines:"
           echo "$CHANGED_LINES"
