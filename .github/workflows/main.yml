@@ -15,10 +15,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Get diff for last commit
         run: |
-          git diff HEAD~1 HEAD Calculator.java > changes.diff
+          git diff HEAD~1 HEAD -- Calculator.java > changes.diff
           cat changes.diff
 
       - name: Run Sample Tests Based on Method Changes
