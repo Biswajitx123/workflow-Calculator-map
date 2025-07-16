@@ -37,7 +37,6 @@ public class Calculator {
 
             System.out.print("Enter second number: ");
             int b = scn.nextInt();
-            int c = scn.nextInt();
 
             try {
                 switch (op) {
