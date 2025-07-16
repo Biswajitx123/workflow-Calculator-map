@@ -1,95 +1,56 @@
-name: Calculator Feature Tests
+name: Calculator Method Check
 
 on:
   push:
     paths:
       - 'Calculator.java'
+  pull_request:
+    paths:
+      - 'Calculator.java'
 
 jobs:
-  detect-changes:
+  method-check:
     runs-on: ubuntu-latest
-    outputs:
-      add_changed: ${{ steps.check.outputs.add }}
-      sub_changed: ${{ steps.check.outputs.sub }}
-      mul_changed: ${{ steps.check.outputs.mul }}
-      div_changed: ${{ steps.check.outputs.div }}
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Detect changes in specific methods
-        id: check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Git to detect changes
         run: |
           git fetch origin main
-          CHANGED_LINES=$(git diff origin/main...HEAD Calculator.java)
+          git diff origin/main...HEAD Calculator.java > changes.diff
+          cat changes.diff
 
-          echo "$CHANGED_LINES"
+      - name: Run Sample Tests Based on Method Changes
+        run: |
+          echo "Checking which method changed..."
+          FOUND=false
 
-          echo "add=false" >> $GITHUB_OUTPUT
-          echo "sub=false" >> $GITHUB_OUTPUT
-          echo "mul=false" >> $GITHUB_OUTPUT
-          echo "div=false" >> $GITHUB_OUTPUT
-
-          if echo "$CHANGED_LINES" | grep -q "add("; then
-            echo "add=true" >> $GITHUB_OUTPUT
-          fi
-          if echo "$CHANGED_LINES" | grep -q "subtract("; then
-            echo "sub=true" >> $GITHUB_OUTPUT
-          fi
-          if echo "$CHANGED_LINES" | grep -q "multiply("; then
-            echo "mul=true" >> $GITHUB_OUTPUT
-          fi
-          if echo "$CHANGED_LINES" | grep -q "divide("; then
-            echo "div=true" >> $GITHUB_OUTPUT
+          if grep -q 'add(' changes.diff; then
+            echo "Detected change in 'add' method"
+            echo "Running sample test for add: 2 + 3 = $((2 + 3))"
+            FOUND=true
           fi
 
-  test-add:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.add_changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Addition Tests
-        run: |
-          echo "Running addition tests..."
-          echo "Test 1: 2 + 3 = 5"
-          echo "Test 2: -1 + 1 = 0"
-          echo "Test 3: 0 + 0 = 0"
+          if grep -q 'subtract(' changes.diff; then
+            echo "Detected change in 'subtract' method"
+            echo "Running sample test for subtract: 5 - 2 = $((5 - 2))"
+            FOUND=true
+          fi
 
-  test-sub:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.sub_changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Subtraction Tests
-        run: |
-          echo "Running subtraction tests..."
-          echo "Test 1: 5 - 3 = 2"
-          echo "Test 2: 0 - 5 = -5"
-          echo "Test 3: -3 - (-3) = 0"
+          if grep -q 'multiply(' changes.diff; then
+            echo "Detected change in 'multiply' method"
+            echo "Running sample test for multiply: 3 * 4 = $((3 * 4))"
+            FOUND=true
+          fi
 
-  test-mul:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.mul_changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Multiplication Tests
-        run: |
-          echo "Running multiplication tests..."
-          echo "Test 1: 2 * 3 = 6"
-          echo "Test 2: -2 * 3 = -6"
-          echo "Test 3: 0 * 100 = 0"
+          if grep -q 'divide(' changes.diff; then
+            echo "Detected change in 'divide' method"
+            echo "Running sample test for divide: 10 / 2 = $((10 / 2))"
+            FOUND=true
+          fi
 
-  test-div:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.div_changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Division Tests
-        run: |
-          echo "Running division tests..."
-          echo "Test 1: 6 / 3 = 2.0"
-          echo "Test 2: 5 / 2 = 2.5"
-          echo "Test 3: 1 / 0 = Error (handled)"
+          if [ "$FOUND" = false ]; then
+            echo "No targeted method changes detected. Skipping test simulation."
+          fi
