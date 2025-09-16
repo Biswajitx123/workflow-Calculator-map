@@ -40,7 +40,6 @@ public class Calculator {
             try {
                 switch (op) {
                     case "+" -> System.out.println("Result: " + calc.add(a, b));
-                    case "+" -> System.out.println("Result: " + calc.add(a, b);
                     case "-" -> System.out.println("Result: " + calc.subtract(a, b));
                     case "*" -> System.out.println("Result: " + calc.multiply(a, b));
                     case "/" -> System.out.println("Result: " + calc.divide(a, b));
